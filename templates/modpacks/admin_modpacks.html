@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Modpacks - Asylum Dev{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h1 class="page-title" style="margin-bottom: 0.5rem;">Manage Modpacks</h1>
+            <p style="color: rgba(255, 255, 255, 0.7);">Manage all modpacks in the system</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{% url 'modpacks:admin_dashboard' %}" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 0.75rem 1.5rem; border-radius: 5px; color: #a855f7; text-decoration: none; font-weight: bold; transition: all 0.3s ease; display: inline-flex; align-items: center;">
+                <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                Back to Dashboard
+            </a>
+            <button onclick="openAddModpackModal()" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 0.75rem 1.5rem; border-radius: 5px; color: #ffffff; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center;">
+                <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>
+                Add Modpack
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 10px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <form method="get" style="display: flex; gap: 1rem; align-items: center;">
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Search modpacks..." 
+                   style="flex: 1; padding: 0.75rem 1rem; border: none; border-radius: 5px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;">
+            <button type="submit" style="background: linear-gradient(45deg, #333333, #000000); border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.75rem 1.5rem; border-radius: 5px; color: #ffffff; font-weight: bold; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(255, 255, 255, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-search"></i> Search
+            </button>
+            {% if search_query %}
+                <a href="{% url 'modpacks:admin_modpacks' %}" style="background: rgba(255, 107, 107, 0.2); border: 1px solid rgba(255, 107, 107, 0.5); padding: 0.75rem 1.5rem; border-radius: 5px; color: #ff6b6b; text-decoration: none; font-weight: bold; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(255, 107, 107, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <i class="fas fa-times"></i> Clear
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Modpacks List -->
+    {% if page_obj %}
+        <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 2rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for modpack in page_obj %}
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="display: flex; align-items: center; gap: 1.5rem; flex: 1;">
+                            <div style="width: 60px; height: 60px; border-radius: 10px; overflow: hidden; background: linear-gradient(45deg, #4a90e2, #357abd); display: flex; align-items: center; justify-content: center;">
+                                {% if modpack.image_url %}
+                                    <img src="{{ modpack.image_url }}" alt="{{ modpack.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-cube" style="font-size: 1.5rem; color: rgba(255, 255, 255, 0.7);"></i>
+                                {% endif %}
+                            </div>
+                            
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: #ffffff; font-size: 1.1rem; margin-bottom: 0.25rem;">{{ modpack.name }}</div>
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                    {{ modpack.minecraft_version|default:"Unknown" }} • {{ modpack.modloader|default:"Unknown" }}
+                                </div>
+                                {% if modpack.summary %}
+                                    <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; line-height: 1.4;">
+                                        {{ modpack.summary|truncatewords:15 }}
+                                    </div>
+                                {% elif modpack.description %}
+                                    <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; line-height: 1.4;">
+                                        {{ modpack.description|truncatewords:15 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="text-align: center;">
+                                <div style="color: #4a90e2; font-weight: bold; font-size: 1.1rem;">{{ modpack.downloads|default:0 }}</div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.8rem;">Downloads</div>
+                            </div>
+                            
+                            <div style="text-align: center;">
+                                <div style="color: #4ecdc4; font-weight: bold; font-size: 1.1rem;">{{ modpack.followers|default:0 }}</div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.8rem;">Followers</div>
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <button onclick="refetchModpack({{ modpack.id }}, '{{ modpack.name }}')" 
+                                        style="background: rgba(74, 144, 226, 0.2); border: 1px solid rgba(74, 144, 226, 0.5); padding: 0.5rem 1rem; border-radius: 5px; color: #4a90e2; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(74, 144, 226, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                    <i class="fas fa-sync-alt" style="margin-right: 0.5rem;"></i>
+                                    Refetch
+                                </button>
+                                
+                                <button onclick="toggleModpack({{ modpack.id }})" 
+                                        style="background: {% if modpack.is_active %}rgba(255, 255, 255, 0.1){% else %}rgba(255, 107, 107, 0.2){% endif %}; border: 1px solid {% if modpack.is_active %}rgba(255, 255, 255, 0.2){% else %}rgba(255, 107, 107, 0.5){% endif %}; padding: 0.5rem 1rem; border-radius: 5px; color: {% if modpack.is_active %}#ffffff{% else %}#ff6b6b{% endif %}; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(255, 255, 255, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                    <i class="fas {% if modpack.is_active %}fa-eye-slash{% else %}fa-eye{% endif %}" style="margin-right: 0.5rem;"></i>
+                                    {% if modpack.is_active %}Deactivate{% else %}Activate{% endif %}
+                                </button>
+                                
+                                <button onclick="deleteModpack({{ modpack.id }}, '{{ modpack.name }}')" 
+                                        style="background: rgba(255, 107, 107, 0.2); border: 1px solid rgba(255, 107, 107, 0.5); padding: 0.5rem 1rem; border-radius: 5px; color: #ff6b6b; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(255, 107, 107, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                    <i class="fas fa-trash" style="margin-right: 0.5rem;"></i>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <div class="pagination" style="margin-top: 2rem;">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="current">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 2rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <i class="fas fa-cube" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3); margin-bottom: 1rem;"></i>
+            <h2 style="color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">No modpacks found</h2>
+            <p style="color: rgba(255, 255, 255, 0.5); margin-bottom: 2rem;">
+                {% if search_query %}
+                    No modpacks match your search criteria.
+                {% else %}
+                    No modpacks have been added yet.
+                {% endif %}
+            </p>
+            <button onclick="openAddModpackModal()" style="background: linear-gradient(45deg, #333333, #000000); border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.75rem 1.5rem; border-radius: 5px; color: #ffffff; font-weight: bold; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(255, 255, 255, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>
+                Add Your First Modpack
+            </button>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Add Modpack Modal -->
+<div id="addModpackModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; backdrop-filter: blur(5px);">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-radius: 20px; padding: 3rem; max-width: 600px; width: 90%; border: 1px solid rgba(255, 255, 255, 0.2); max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="color: #4a90e2; margin: 0;">Add New Modpack</h2>
+            <button onclick="closeAddModpackModal()" style="background: none; border: none; color: rgba(255, 255, 255, 0.7); font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        
+        <form id="addModpackForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div>
+                <label for="modpackName" style="display: block; margin-bottom: 0.5rem; color: rgba(255, 255, 255, 0.8); font-weight: 500;">
+                    <i class="fas fa-tag" style="margin-right: 0.5rem;"></i>
+                    Pack Name *
+                </label>
+                <input type="text" id="modpackName" required 
+                       style="width: 100%; padding: 1rem; border: none; border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;"
+                       placeholder="Enter pack name">
+            </div>
+
+            <div>
+                <label for="projectId" style="display: block; margin-bottom: 0.5rem; color: rgba(255, 255, 255, 0.8); font-weight: 500;">
+                    <i class="fas fa-hashtag" style="margin-right: 0.5rem;"></i>
+                    CurseForge Project ID *
+                </label>
+                <input type="text" id="projectId" required 
+                       style="width: 100%; padding: 1rem; border: none; border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;"
+                       placeholder="e.g., 123456">
+                <small style="color: rgba(255, 255, 255, 0.6); font-size: 0.8rem; margin-top: 0.5rem; display: block;">
+                    Image, description, and other details will be automatically fetched from CurseForge
+                </small>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="submit" style="flex: 1; background: linear-gradient(45deg, #333333, #000000); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 25px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>
+                    Add Modpack
+                </button>
+                <button type="button" onclick="closeAddModpackModal()" 
+                        style="flex: 1; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.75rem 1.5rem; border-radius: 5px; color: #ffffff; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openAddModpackModal() {
+    document.getElementById('addModpackModal').style.display = 'block';
+}
+
+function closeAddModpackModal() {
+    document.getElementById('addModpackModal').style.display = 'none';
+}
+
+async function toggleModpack(modpackId) {
+    if (!confirm('Are you sure you want to change this modpack\'s status?')) return;
+    
+    try {
+        const response = await fetch(`/api/modpacks/${modpackId}/toggle/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error updating modpack: ' + error.message);
+    }
+}
+
+async function refetchModpack(modpackId, modpackName) {
+    if (!confirm(`Are you sure you want to refetch data for "${modpackName}"? This will update the modpack with the latest information from CurseForge.`)) return;
+    
+    try {
+        const response = await fetch(`/api/modpacks/${modpackId}/refetch/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Modpack data refetched successfully!');
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error refetching modpack: ' + error.message);
+    }
+}
+
+async function deleteModpack(modpackId, modpackName) {
+    if (!confirm(`Are you sure you want to delete "${modpackName}"? This action cannot be undone.`)) return;
+    
+    try {
+        const response = await fetch(`/api/modpacks/${modpackId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error deleting modpack: ' + error.message);
+    }
+}
+
+// Close modal when clicking outside
+document.getElementById('addModpackModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAddModpackModal();
+    }
+});
+
+// Handle form submission with CurseForge data fetching
+document.getElementById('addModpackForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('modpackName').value;
+    const projectId = document.getElementById('projectId').value;
+    
+    if (!name || !projectId) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Validate project ID is numeric
+    if (!/^\d+$/.test(projectId)) {
+        alert('Project ID must be a number.');
+        return;
+    }
+    
+    try {
+        const response = await fetch('{% url "modpacks:api_create_modpack" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({ name, project_id: projectId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Modpack created successfully!');
+            closeAddModpackModal();
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error creating modpack: ' + error.message);
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ modpack.name }} - Files - Asylum Dev{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'modpacks:modpack_detail' modpack.slug %}" style="color: #4a90e2; text-decoration: none; display: inline-flex; align-items: center; margin-bottom: 1rem;">
+            <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i> Back to {{ modpack.name }}
+        </a>
+    </div>
+
+    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; margin-bottom: 1rem; color: #ffffff;">
+            <i class="fas fa-file-archive" style="margin-right: 0.5rem;"></i>
+            {{ modpack.name }} - Files
+        </h1>
+        
+        {% if error %}
+            <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 10px; padding: 1rem; margin-bottom: 2rem; color: #ff6b6b;">
+                <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% if files %}
+            <div style="overflow-x: auto; border-radius: 10px;">
+                <table style="width: 100%; border-collapse: collapse; color: #ffffff; min-width: 800px;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+                            <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Type</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Name</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Uploaded</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Size</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Game Ver.</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Mod Loaders</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Downloads</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in files %}
+                            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                <td style="padding: 1rem;">
+                                    {% if file.release_type == 1 %}
+                                        <span style="background: rgba(78, 205, 196, 0.2); color: #4ecdc4; padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem; white-space: nowrap; display: inline-block;">
+                                            <i class="fas fa-star" style="margin-right: 0.25rem;"></i>Release
+                                        </span>
+                                    {% elif file.release_type == 2 %}
+                                        <span style="background: rgba(254, 202, 87, 0.2); color: #feca57; padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem; white-space: nowrap; display: inline-block;">
+                                            <i class="fas fa-flask" style="margin-right: 0.25rem;"></i>Beta
+                                        </span>
+                                    {% elif file.release_type == 3 %}
+                                        <span style="background: rgba(255, 107, 107, 0.2); color: #ff6b6b; padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem; white-space: nowrap; display: inline-block;">
+                                            <i class="fas fa-vial" style="margin-right: 0.25rem;"></i>Alpha
+                                        </span>
+                                    {% else %}
+                                        <span style="background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.7); padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem; white-space: nowrap; display: inline-block;">
+                                            Unknown
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <div style="font-weight: bold; color: #ffffff;">{{ file.display_name }}</div>
+                                    <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
+                                        {% if file.file_name|slice:"-4:" == ".zip" %}
+                                            {{ file.file_name|slice:":-4" }}
+                                        {% else %}
+                                            {{ file.file_name }}
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem; color: rgba(255, 255, 255, 0.8); white-space: nowrap; min-width: 80px;">
+                                    {% if file.file_date %}
+                                        {{ file.file_date|slice:":10"|date:"M d, Y" }}
+                                    {% else %}
+                                        Unknown
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 1rem; color: rgba(255, 255, 255, 0.8);">
+                                    {% if file.file_length %}
+                                        {% widthratio file.file_length 1048576 1 %} MB
+                                    {% else %}
+                                        Unknown
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 1rem; color: rgba(255, 255, 255, 0.8);">
+                                    {% for version in file.game_versions %}
+                                        {% if version|slice:":1" == "1" %}
+                                            {{ version }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td style="padding: 1rem; color: rgba(255, 255, 255, 0.8);">
+                                    {% for loader in file.mod_loaders %}
+                                        <span style="background: rgba(74, 144, 226, 0.2); color: #4a90e2; padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem; margin-right: 0.25rem; white-space: nowrap; display: inline-block;">
+                                            {{ loader }}
+                                        </span>
+                                    {% endfor %}
+                                </td>
+                                <td style="padding: 1rem; color: rgba(255, 255, 255, 0.8);">
+                                    {% if file.download_count %}
+                                        {% if file.download_count >= 1000 %}
+                                            {% widthratio file.download_count 1000 1 %}K
+                                        {% else %}
+                                            {{ file.download_count }}
+                                        {% endif %}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 1rem;">
+                                    {% if file.download_url %}
+                                        <a href="{{ file.download_url }}" target="_blank" style="background: rgba(74, 144, 226, 0.2); color: #4a90e2; padding: 0.5rem 1rem; border-radius: 5px; text-decoration: none; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap; display: inline-block;">
+                                            <i class="fas fa-download" style="margin-right: 0.25rem;"></i>
+                                            Download
+                                        </a>
+                                    {% else %}
+                                        <span style="color: rgba(255, 255, 255, 0.5); font-size: 0.9rem;">No download</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7);">
+                <i class="fas fa-file-archive" style="font-size: 4rem; margin-bottom: 1rem; display: block; color: rgba(255, 255, 255, 0.3);"></i>
+                <h3 style="margin-bottom: 1rem;">No files found</h3>
+                <p>No files are available for this modpack at the moment.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

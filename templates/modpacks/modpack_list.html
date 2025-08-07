@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modpacks - Asylum Dev{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 3rem;">
+    <h1 class="page-title" style="font-size: 3rem; font-weight: bold; margin-bottom: 1rem; background: linear-gradient(45deg, #ffffff, #cccccc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Modpacks</h1>
+    <p style="color: rgba(255, 255, 255, 0.7); font-size: 1.1rem;">Discover amazing Minecraft modpacks</p>
+</div>
+
+<div class="card" style="margin-bottom: 3rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
+    <div style="padding: 1.5rem;">
+        <h3 style="color: #4a90e2; margin-bottom: 1rem; font-size: 1.2rem;">
+            <i class="fas fa-filter" style="margin-right: 0.5rem;"></i>Filter Modpacks
+        </h3>
+        
+        <form method="get" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 0.5rem;">Search</label>
+                <input type="text" name="search" value="{{ search_query }}" placeholder="Search modpacks..." 
+                       style="width: 100%; padding: 0.75rem 1rem; border: none; border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;">
+            </div>
+            
+            <div style="min-width: 150px;">
+                <label style="display: block; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 0.5rem;">Minecraft Version</label>
+                <select name="mc_version" style="width: 100%; padding: 0.75rem 1rem; border: none; border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;">
+                    <option value="">All Versions</option>
+                    {% for version in minecraft_versions %}
+                        <option value="{{ version }}" {% if version == mc_version %}selected{% endif %}>{{ version }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="min-width: 150px;">
+                <label style="display: block; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 0.5rem;">Modloader</label>
+                <select name="modloader" style="width: 100%; padding: 0.75rem 1rem; border: none; border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;">
+                    <option value="">All Modloaders</option>
+                    {% for loader in modloaders %}
+                        <option value="{{ loader }}" {% if loader == modloader %}selected{% endif %}>{{ loader }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: end;">
+                <button type="submit" class="btn" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4a90e2, #357abd); border: none; border-radius: 8px; color: white; font-weight: bold;">
+                    <i class="fas fa-filter" style="margin-right: 0.5rem;"></i>Apply Filters
+                </button>
+                
+                {% if search_query or mc_version or modloader %}
+                    <a href="{% url 'modpacks:modpack_list' %}" class="btn" style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #ffffff; text-decoration: none; font-weight: bold;">
+                        <i class="fas fa-times" style="margin-right: 0.5rem;"></i>Clear
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+        
+        {% if search_query or mc_version or modloader %}
+            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(74, 144, 226, 0.1); border-radius: 8px; border-left: 4px solid #4a90e2;">
+                <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.9rem;">
+                    <strong>Active Filters:</strong>
+                    {% if search_query %}<span style="background: rgba(74, 144, 226, 0.2); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;">Search: "{{ search_query }}"</span>{% endif %}
+                    {% if mc_version %}<span style="background: rgba(78, 205, 196, 0.2); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;">Version: {{ mc_version }}</span>{% endif %}
+                    {% if modloader %}<span style="background: rgba(254, 202, 87, 0.2); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;">Modloader: {{ modloader }}</span>{% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if page_obj %}
+    <div class="grid">
+        {% for modpack in page_obj %}
+            <div class="card modpack-card" style="padding: 0; overflow: hidden;">
+                <div style="position: relative;">
+                    {% if modpack.image_url %}
+                        <img src="{{ modpack.image_url }}" alt="{{ modpack.name }}" 
+                             style="width: 100%; height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 100%; height: 200px; background: linear-gradient(45deg, #333333, #000000); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-cube" style="font-size: 3rem; color: rgba(255, 255, 255, 0.7);"></i>
+                        </div>
+                    {% endif %}
+                    <div style="position: absolute; top: 10px; left: 10px; background: rgba(0, 0, 0, 0.7); padding: 0.25rem 0.5rem; border-radius: 3px;">
+                        <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 20px; width: auto;">
+                    </div>
+                </div>
+                <div style="padding: 1.5rem;">
+                    <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem; color: #ffffff;">{{ modpack.name }}</h3>
+                    <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; line-height: 1.4;">
+                        <div style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-gamepad" style="margin-right: 0.5rem; color: #cccccc;"></i>
+                            Minecraft {{ modpack.minecraft_version|default:"Unknown" }}
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-cogs" style="margin-right: 0.5rem; color: #999999;"></i>
+                            {{ modpack.modloader|default:"Unknown" }}
+                        </div>
+                        {% if modpack.downloads > 0 %}
+                            <div style="margin-top: 0.5rem; color: #cccccc;">
+                                <i class="fas fa-download"></i> {{ modpack.downloads|floatformat:0 }} downloads
+                            </div>
+                        {% endif %}
+                        {% if modpack.followers > 0 %}
+                            <div style="margin-top: 0.25rem; color: #999999;">
+                                <i class="fas fa-heart"></i> {{ modpack.followers|floatformat:0 }} followers
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <a href="{% url 'modpacks:modpack_detail' modpack.slug %}" class="btn" style="width: 100%; text-align: center; display: block;">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 3rem;">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if mc_version %}&mc_version={{ mc_version }}{% endif %}{% if modloader %}&modloader={{ modloader }}{% endif %}" 
+                   class="btn" style="padding: 0.5rem 1rem;">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if mc_version %}&mc_version={{ mc_version }}{% endif %}{% if modloader %}&modloader={{ modloader }}{% endif %}" 
+                   class="btn" style="padding: 0.5rem 1rem;">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span style="padding: 0.5rem 1rem; background: #333333; border-radius: 25px; color: white;">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if mc_version %}&mc_version={{ mc_version }}{% endif %}{% if modloader %}&modloader={{ modloader }}{% endif %}" 
+                       class="btn" style="padding: 0.5rem 1rem;">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if mc_version %}&mc_version={{ mc_version }}{% endif %}{% if modloader %}&modloader={{ modloader }}{% endif %}" 
+                   class="btn" style="padding: 0.5rem 1rem;">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if mc_version %}&mc_version={{ mc_version }}{% endif %}{% if modloader %}&modloader={{ modloader }}{% endif %}" 
+                   class="btn" style="padding: 0.5rem 1rem;">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 2rem; color: rgba(255, 255, 255, 0.7);">
+        <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
+        Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_modpacks }} modpacks
+    </div>
+
+{% else %}
+    <div class="card" style="text-align: center; padding: 4rem 2rem;">
+        <i class="fas fa-search" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3); margin-bottom: 1rem;"></i>
+        <h2 style="color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">No modpacks found</h2>
+        <p style="color: rgba(255, 255, 255, 0.5);">Try adjusting your search criteria or filters.</p>
+    </div>
+{% endif %}
+{% endblock %} 

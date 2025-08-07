@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Asylum Dev{% endblock %}
+
+{% block content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-radius: 20px; padding: 3rem; max-width: 400px; width: 100%; border: 1px solid rgba(255, 255, 255, 0.2);">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                <img src="{% static 'images/logo.png' %}" alt="Asylum Dev Logo" style="height: 120px; width: auto">
+            </div>
+            <p style="color: rgba(255, 255, 255, 0.7); font-size: 1.1rem;">Admin Panel</p>
+        </div>
+
+        {% if error %}
+        <div style="background: rgba(255, 107, 107, 0.2); border: 1px solid rgba(255, 107, 107, 0.5); border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem; color: #ff6b6b;">
+            <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% csrf_token %}
+            
+            <div>
+                <label for="username" style="display: block; margin-bottom: 0.5rem; color: rgba(255, 255, 255, 0.8); font-weight: 500;">
+                    <i class="fas fa-user" style="margin-right: 0.5rem;"></i>
+                    Username
+                </label>
+                <input type="text" id="username" name="username" required 
+                       style="width: 100%; padding: 1rem; border: none; border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem; transition: all 0.3s ease;"
+                       placeholder="Enter your username">
+            </div>
+
+            <div>
+                <label for="password" style="display: block; margin-bottom: 0.5rem; color: rgba(255, 255, 255, 0.8); font-weight: 500;">
+                    <i class="fas fa-lock" style="margin-right: 0.5rem;"></i>
+                    Password
+                </label>
+                <input type="password" id="password" name="password" required 
+                       style="width: 100%; padding: 1rem; border: none; border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem; transition: all 0.3s ease;"
+                       placeholder="Enter your password">
+            </div>
+
+            <button type="submit" 
+                    style="background: linear-gradient(45deg, #333333, #000000); border: none; border-radius: 10px; padding: 1rem; color: #ffffff; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem;">
+                <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>
+                Sign In
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="{% url 'modpacks:home' %}" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.9rem; transition: color 0.3s ease;">
+                <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+                Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+a:hover {
+    color: #ffffff !important;
+}
+</style>
+{% endblock %} 

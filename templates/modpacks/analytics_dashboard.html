@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - Asylum Dev{% endblock %}
+
+{% block content %}
+<div style="max-width: 1400px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'modpacks:admin_dashboard' %}" style="color: #4a90e2; text-decoration: none; display: inline-flex; align-items: center; margin-bottom: 1rem;">
+            <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; margin-bottom: 1rem; color: #ffffff;">
+            <i class="fas fa-chart-line" style="margin-right: 0.5rem;"></i>
+            Analytics Dashboard
+        </h1>
+        
+        <!-- Summary Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Total Hits -->
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">Total Hits</div>
+                        <div style="color: #4a90e2; font-size: 2rem; font-weight: bold;">{{ analytics.total_hits }}</div>
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.3); font-size: 2rem;">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Unique Hits -->
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">Unique Visits</div>
+                        <div style="color: #4ecdc4; font-size: 2rem; font-weight: bold;">{{ analytics.unique_hits }}</div>
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.3); font-size: 2rem;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Today's Hits -->
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">Today's Hits</div>
+                        <div style="color: #feca57; font-size: 2rem; font-weight: bold;">{{ analytics.today_hits }}</div>
+                        <div style="color: rgba(255, 255, 255, 0.5); font-size: 0.8rem;">{{ analytics.today_unique }} unique</div>
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.3); font-size: 2rem;">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- This Week -->
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">This Week</div>
+                        <div style="color: #ff6b6b; font-size: 2rem; font-weight: bold;">{{ analytics.week_hits }}</div>
+                        <div style="color: rgba(255, 255, 255, 0.5); font-size: 0.8rem;">{{ analytics.week_unique }} unique</div>
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.3); font-size: 2rem;">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Stats -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Top Countries -->
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 10px;">
+                <h3 style="color: #4a90e2; margin-bottom: 1rem; font-size: 1.2rem;">
+                    <i class="fas fa-globe" style="margin-right: 0.5rem;"></i>
+                    Top Countries
+                </h3>
+                {% if analytics.top_countries %}
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        {% for country in analytics.top_countries %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 5px;">
+                            <div style="color: rgba(255, 255, 255, 0.9);">{{ country.country|default:"Unknown" }}</div>
+                            <div style="color: #4a90e2; font-weight: bold;">{{ country.count }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="color: rgba(255, 255, 255, 0.5); text-align: center; padding: 2rem;">
+                        No country data available
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Top Pages -->
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 10px;">
+                <h3 style="color: #4a90e2; margin-bottom: 1rem; font-size: 1.2rem;">
+                    <i class="fas fa-file-alt" style="margin-right: 0.5rem;"></i>
+                    Top Pages
+                </h3>
+                {% if analytics.top_pages %}
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        {% for page in analytics.top_pages %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 5px;">
+                            <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ page.page_url }}</div>
+                            <div style="color: #4a90e2; font-weight: bold;">{{ page.count }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="color: rgba(255, 255, 255, 0.5); text-align: center; padding: 2rem;">
+                        No page data available
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent Hits -->
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: #4a90e2; font-size: 1.2rem; margin: 0;">
+                    <i class="fas fa-clock" style="margin-right: 0.5rem;"></i>
+                    Recent Hits
+                </h3>
+                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
+                    Showing last 10 of {{ total_hits_count }} total hits
+                    <a href="/admin/modpacks/siteanalytics/" target="_blank" style="color: #4a90e2; margin-left: 1rem; text-decoration: none;">
+                        <i class="fas fa-external-link-alt" style="margin-right: 0.25rem;"></i>
+                        View All
+                    </a>
+                </div>
+            </div>
+            {% if recent_hits %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; color: #ffffff;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+                                <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Time</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">IP Address</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Country</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Page</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: bold; color: #4a90e2;">Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hit in recent_hits %}
+                            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                <td style="padding: 1rem; color: rgba(255, 255, 255, 0.8); white-space: nowrap;">
+                                    {{ hit.created_at|date:"M d, H:i" }}
+                                </td>
+                                <td style="padding: 1rem; color: rgba(255, 255, 255, 0.8); font-family: monospace;">
+                                    {{ hit.ip_address }}
+                                </td>
+                                <td style="padding: 1rem; color: rgba(255, 255, 255, 0.8);">
+                                    {{ hit.country|default:"Unknown" }}
+                                </td>
+                                <td style="padding: 1rem; color: rgba(255, 255, 255, 0.8); max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ hit.page_url }}
+                                </td>
+                                <td style="padding: 1rem;">
+                                    {% if hit.is_unique_visit %}
+                                        <span style="background: rgba(78, 205, 196, 0.2); color: #4ecdc4; padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem;">
+                                            <i class="fas fa-user" style="margin-right: 0.25rem;"></i>Unique
+                                        </span>
+                                    {% else %}
+                                        <span style="background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.7); padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem;">
+                                            <i class="fas fa-eye" style="margin-right: 0.25rem;"></i>Return
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="color: rgba(255, 255, 255, 0.5); text-align: center; padding: 2rem;">
+                    No recent hits available
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

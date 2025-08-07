@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Asylum Dev{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div style="background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(53, 122, 189, 0.1) 100%); border-radius: 20px; padding: 4rem 2rem; margin-bottom: 4rem; text-align: center; position: relative; overflow: hidden;">
+    <!-- Background Pattern -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.02"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.5;"></div>
+    
+    <div style="position: relative; z-index: 1;">
+        <div style="margin-bottom: 2rem;">
+            <img src="{% static 'images/logo.png' %}" alt="Asylum Dev" style="height: 80px; width: auto; margin-bottom: 1rem;">
+        </div>
+        
+        <h1 style="font-size: 3.5rem; font-weight: bold; color: #ffffff; margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">
+            Welcome to Asylum Dev
+        </h1>
+        
+        <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.3rem; max-width: 700px; margin: 0 auto 2rem; line-height: 1.6;">
+            Discover amazing Minecraft modpacks curated by the Asylum Dev team. 
+            From kitchen sink packs to specialized experiences, we've got something for every player.
+        </p>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'modpacks:modpack_list' %}" style="background: linear-gradient(135deg, #4a90e2, #357abd); color: white; padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3); display: inline-flex; align-items: center;">
+                <i class="fas fa-th-large" style="margin-right: 0.5rem;"></i>
+                Browse All Modpacks
+            </a>
+            
+            <a href="{% url 'modpacks:modpack_list' %}" style="background: rgba(255, 255, 255, 0.1); color: #4a90e2; padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: all 0.3s ease; border: 2px solid rgba(74, 144, 226, 0.3); display: inline-flex; align-items: center;">
+                <i class="fas fa-star" style="margin-right: 0.5rem;"></i>
+                Featured Packs
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Modpacks Section -->
+{% if featured_modpacks %}
+<div style="margin-bottom: 4rem;">
+    <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <div style="background: linear-gradient(135deg, #4a90e2, #357abd); width: 4px; height: 40px; border-radius: 2px; margin-right: 1rem;"></div>
+        <h2 style="font-size: 2.5rem; color: #ffffff; margin: 0;">Featured Modpacks</h2>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+        {% for modpack in featured_modpacks %}
+            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);">
+                <div style="position: relative;">
+                    {% if modpack.image_url %}
+                        <img src="{{ modpack.image_url }}" alt="{{ modpack.name }}" style="width: 100%; height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #4a90e2, #357abd); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-cube" style="font-size: 4rem; color: rgba(255, 255, 255, 0.7);"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Featured Badge -->
+                    <div style="position: absolute; top: 15px; left: 15px; background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);">
+                        <i class="fas fa-star" style="margin-right: 0.25rem;"></i>Featured
+                    </div>
+                    
+                    <!-- Logo Overlay -->
+                    <div style="position: absolute; top: 15px; right: 15px; background: rgba(0, 0, 0, 0.7); padding: 0.5rem; border-radius: 8px;">
+                        <img src="{% static 'images/logo.png' %}" alt="Asylum Dev" style="height: 20px; width: auto;">
+                    </div>
+                </div>
+                
+                <div style="padding: 1.5rem;">
+                    <h3 style="font-size: 1.4rem; color: #ffffff; margin-bottom: 1rem; font-weight: bold;">{{ modpack.name }}</h3>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                        <span style="background: rgba(74, 144, 226, 0.2); color: #4a90e2; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
+                            <i class="fas fa-gamepad" style="margin-right: 0.25rem;"></i>{{ modpack.minecraft_version|default:"Unknown" }}
+                        </span>
+                        <span style="background: rgba(78, 205, 196, 0.2); color: #4ecdc4; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
+                            <i class="fas fa-cog" style="margin-right: 0.25rem;"></i>{{ modpack.modloader|default:"Unknown" }}
+                        </span>
+                    </div>
+                    
+                    {% if modpack.downloads > 0 %}
+                        <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 1rem;">
+                            <i class="fas fa-download" style="margin-right: 0.5rem; color: #4a90e2;"></i>
+                            {{ modpack.downloads|floatformat:0 }} downloads
+                        </div>
+                    {% endif %}
+                    
+                    <a href="{% url 'modpacks:modpack_detail' modpack.slug %}" style="background: linear-gradient(135deg, #4a90e2, #357abd); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; transition: all 0.3s ease;">
+                        <i class="fas fa-eye" style="margin-right: 0.5rem;"></i>View Details
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Recent Modpacks Section -->
+{% if recent_modpacks %}
+<div style="margin-bottom: 4rem;">
+    <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <div style="background: linear-gradient(135deg, #4ecdc4, #44a08d); width: 4px; height: 40px; border-radius: 2px; margin-right: 1rem;"></div>
+        <h2 style="font-size: 2.5rem; color: #ffffff; margin: 0;">Recent Modpacks</h2>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+        {% for modpack in recent_modpacks %}
+            <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
+                <div style="position: relative;">
+                    {% if modpack.image_url %}
+                        <img src="{{ modpack.image_url }}" alt="{{ modpack.name }}" style="width: 100%; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 100%; height: 150px; background: linear-gradient(135deg, #4ecdc4, #44a08d); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-cube" style="font-size: 3rem; color: rgba(255, 255, 255, 0.7);"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Logo Overlay -->
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); padding: 0.4rem; border-radius: 6px;">
+                        <img src="{% static 'images/logo.png' %}" alt="Asylum Dev" style="height: 16px; width: auto;">
+                    </div>
+                </div>
+                
+                <div style="padding: 1rem;">
+                    <h3 style="font-size: 1.1rem; color: #ffffff; margin-bottom: 0.75rem; font-weight: bold;">{{ modpack.name }}</h3>
+                    
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="background: rgba(74, 144, 226, 0.15); color: #4a90e2; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem;">
+                            {{ modpack.minecraft_version|default:"Unknown" }}
+                        </span>
+                        <span style="background: rgba(78, 205, 196, 0.15); color: #4ecdc4; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem;">
+                            {{ modpack.modloader|default:"Unknown" }}
+                        </span>
+                    </div>
+                    
+                    {% if modpack.downloads > 0 %}
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.8rem; margin-bottom: 0.75rem;">
+                            <i class="fas fa-download" style="margin-right: 0.25rem; color: #4a90e2;"></i>
+                            {{ modpack.downloads|floatformat:0 }} downloads
+                        </div>
+                    {% endif %}
+                    
+                    <a href="{% url 'modpacks:modpack_detail' modpack.slug %}" style="color: #4a90e2; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: inline-flex; align-items: center;">
+                        View Details <i class="fas fa-arrow-right" style="margin-left: 0.25rem;"></i>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Call to Action -->
+<div style="text-align: center; margin-top: 4rem; padding: 3rem 2rem; background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, rgba(53, 122, 189, 0.05) 100%); border-radius: 20px;">
+    <h2 style="font-size: 2rem; color: #ffffff; margin-bottom: 1rem;">Ready to Explore?</h2>
+    <p style="color: rgba(255, 255, 255, 0.8); font-size: 1.1rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+        Discover our complete collection of Minecraft modpacks, each carefully crafted for the ultimate gaming experience.
+    </p>
+    <a href="{% url 'modpacks:modpack_list' %}" style="background: linear-gradient(135deg, #4a90e2, #357abd); color: white; padding: 1rem 2.5rem; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3); display: inline-flex; align-items: center;">
+        <i class="fas fa-th-large" style="margin-right: 0.5rem;"></i>
+        Browse All Modpacks
+    </a>
+</div>
+
+<!-- Empty State -->
+{% if not featured_modpacks and not recent_modpacks %}
+<div style="text-align: center; padding: 6rem 2rem; background: rgba(255, 255, 255, 0.02); border-radius: 20px; border: 2px dashed rgba(255, 255, 255, 0.1);">
+    <div style="background: rgba(74, 144, 226, 0.1); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+        <i class="fas fa-cube" style="font-size: 3rem; color: #4a90e2;"></i>
+    </div>
+    <h2 style="color: #ffffff; margin-bottom: 1rem; font-size: 2rem;">No modpacks available yet</h2>
+    <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 2rem; font-size: 1.1rem;">
+        We're working hard to bring you amazing modpacks. Check back soon!
+    </p>
+    <a href="/staff/" style="background: rgba(74, 144, 226, 0.2); color: #4a90e2; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; border: 1px solid rgba(74, 144, 226, 0.3);">
+        <i class="fas fa-cog" style="margin-right: 0.5rem;"></i>
+        Admin Panel
+    </a>
+</div>
+{% endif %}
+{% endblock %} 
