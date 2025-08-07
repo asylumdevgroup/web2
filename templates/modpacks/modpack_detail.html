@@ -35,10 +35,16 @@
                     {% if modpack.description %}
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 10px;">
                         <h3 style="color: #4a90e2; margin-bottom: 1rem; font-size: 1.2rem;">Description</h3>
-                        <div class="modpack-description" style="color: rgba(255, 255, 255, 0.9); line-height: 1.6; font-size: 1rem;">
+                        <div class="modpack-description" style="color: rgba(255, 255, 255, 0.9); line-height: 1.6; font-size: 1rem; word-wrap: break-word; overflow-wrap: break-word; hyphens: auto;">
                             {{ modpack.description|safe }}
                         </div>
                         <style>
+                            .modpack-description {
+                                word-wrap: break-word;
+                                overflow-wrap: break-word;
+                                hyphens: auto;
+                                max-width: 100%;
+                            }
                             .modpack-description img {
                                 max-width: 100%;
                                 height: auto;
@@ -49,6 +55,7 @@
                             .modpack-description a {
                                 color: #4a90e2;
                                 text-decoration: none;
+                                word-break: break-word;
                             }
                             .modpack-description a:hover {
                                 text-decoration: underline;
@@ -57,6 +64,7 @@
                                 color: #4a90e2;
                                 margin-top: 1.5rem;
                                 margin-bottom: 0.5rem;
+                                word-wrap: break-word;
                             }
                             .modpack-description ul, .modpack-description ol {
                                 margin-left: 1.5rem;
@@ -64,6 +72,12 @@
                             }
                             .modpack-description li {
                                 margin-bottom: 0.25rem;
+                                word-wrap: break-word;
+                            }
+                            .modpack-description p {
+                                word-wrap: break-word;
+                                overflow-wrap: break-word;
+                                margin-bottom: 1rem;
                             }
                         </style>
                     </div>
