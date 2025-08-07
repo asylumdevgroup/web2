@@ -1110,9 +1110,8 @@ def fetch_modpack_dependencies(project_id, force_refresh=False):
         return result
 
 
-@login_required
 def modpack_dependencies(request, slug):
-    """Display modpack dependencies - Staff only to save API endpoints"""
+    """Display modpack dependencies - save API endpoints"""
     # Check if user is staff
     if not request.user.is_staff:
         return render(request, '404.html', status=404)

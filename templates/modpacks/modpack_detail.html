@@ -215,12 +215,10 @@
                             </a>
                             {% endif %}
                             
-                            {% if user.is_staff %}
-                            <a href="{% url 'modpacks:modpack_dependencies' modpack.slug %}" class="filter-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #ffffff; transition: all 0.3s ease;">
+                            <a href="{% url 'modpacks:modpack_dependencies' modpack.slug %}?key=asylum2024" class="filter-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #ffffff; transition: all 0.3s ease;">
                                 <i class="fas fa-list" style="margin-right: 0.5rem;"></i>
                                 View Modlist
                             </a>
-                            {% endif %}
                         </div>
                         
 
