@@ -17,8 +17,8 @@ import requests
 import threading
 import time
 import re
-from datetime import datetime, timedelta
-from django.utils import timezone
+from datetime import datetime, timedelta, timezone
+from django.utils import timezone as django_timezone
 
 
 def modpack_list(request):
@@ -945,7 +945,7 @@ def fetch_modpack_dependencies(project_id, force_refresh=False):
                 models.Max('last_fetched')
             )['last_fetched__max']
             
-            if latest_fetch and (datetime.now().replace(tzinfo=timezone.utc) - latest_fetch).days < 1:
+            if latest_fetch and (django_timezone.now() - latest_fetch).days < 1:
                 print(f"Using stored dependencies for project {project_id}")
                 dependencies_list = []
                 for dep in stored_dependencies:
