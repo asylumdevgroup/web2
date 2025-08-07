@@ -15,9 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from modpacks.views import admin_dashboard
 
 urlpatterns = [
     path('staff/', admin_dashboard, name='admin_dashboard'),
     path('', include('modpacks.urls')),
 ]
+
+# Serve static files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
