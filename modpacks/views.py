@@ -1112,9 +1112,6 @@ def fetch_modpack_dependencies(project_id, force_refresh=False):
 
 def modpack_dependencies(request, slug):
     """Display modpack dependencies - save API endpoints"""
-    # Check if user is staff
-    if not request.user.is_staff:
-        return render(request, '404.html', status=404)
     
     modpack = get_object_or_404(Modpack, slug=slug, is_deleted=False, is_active=True)
     
