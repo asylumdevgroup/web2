@@ -7,8 +7,7 @@ echo "🚀 Starting AsylumSite..."
 
 # --- Kill existing processes ---
 echo "Stopping existing processes..."
-pkill -f "python.*manage.py runserver" 2>/dev/null
-pkill -f "python.*start_updates" 2>/dev/null
+
 pkill -f "gunicorn" 2>/dev/null
 pkill -f "python3" 2>/dev/null
 
