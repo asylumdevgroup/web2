@@ -14,10 +14,7 @@ import threading
 import time
 import re
 import requests
-import threading
-import time
-import re
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from django.utils import timezone as django_timezone
 
 
@@ -257,7 +254,7 @@ def _run_scraping_task(task):
     try:
         # Update task status
         task.status = 'running'
-        task.started_at = datetime.now(timezone.utc)
+        task.started_at = django_timezone.now()
         task.save()
         
         modpacks_found = 0
@@ -311,7 +308,7 @@ def _run_scraping_task(task):
                         existing_modpack.modloader = curseforge_data.get('modloader', '') or 'Unknown'
                         existing_modpack.downloads = curseforge_data.get('downloads', 0)
                         existing_modpack.followers = curseforge_data.get('followers', 0)
-                        existing_modpack.last_updated = datetime.now(timezone.utc)
+                        existing_modpack.last_updated = django_timezone.now()
                         existing_modpack.is_active = True
                         existing_modpack.save()
                         modpack = existing_modpack
@@ -331,7 +328,7 @@ def _run_scraping_task(task):
                             modloader=curseforge_data.get('modloader', '') or 'Unknown',
                             downloads=curseforge_data.get('downloads', 0),
                             followers=curseforge_data.get('followers', 0),
-                            last_updated=datetime.now(timezone.utc),
+                            last_updated=django_timezone.now(),
                             is_active=True
                         )
                         created = True
@@ -351,7 +348,7 @@ def _run_scraping_task(task):
                         modloader=curseforge_data.get('modloader', '') or 'Unknown',
                         downloads=curseforge_data.get('downloads', 0),
                         followers=curseforge_data.get('followers', 0),
-                        last_updated=datetime.now(timezone.utc),
+                        last_updated=django_timezone.now(),
                         is_active=True
                     )
                     created = True
@@ -366,7 +363,7 @@ def _run_scraping_task(task):
         
         # Update task status
         task.status = 'completed'
-        task.completed_at = datetime.now(timezone.utc)
+        task.completed_at = django_timezone.now()
         task.modpacks_found = modpacks_found
         task.save()
         
@@ -375,7 +372,7 @@ def _run_scraping_task(task):
     except Exception as e:
         # Update task status on error
         task.status = 'failed'
-        task.completed_at = datetime.now(timezone.utc)
+        task.completed_at = django_timezone.now()
         task.error_message = str(e)
         task.save()
         print(f"Scraping task {task.id} failed: {e}")
@@ -551,7 +548,7 @@ def api_refetch_modpack(request, modpack_id):
             # Ensure project ID is stored
             modpack.project_id = project_id
             
-            modpack.last_updated = datetime.now(timezone.utc)
+            modpack.last_updated = django_timezone.now()
             modpack.save()
             
             return JsonResponse({
@@ -787,7 +784,7 @@ def update_modpack_data(modpack):
             # Ensure project ID is stored
             modpack.project_id = project_id
             
-            modpack.last_updated = datetime.now(timezone.utc)
+            modpack.last_updated = django_timezone.now()
             modpack.save()
             return True
         else:
@@ -799,12 +796,11 @@ def update_modpack_data(modpack):
 
 def schedule_modpack_updates():
     """Background task to update all modpacks every 30 minutes and run pending tasks every 5 minutes"""
-    import datetime
     
     last_modpack_update = 0
     last_task_run = 0
     
-    print(f"[{datetime.now(timezone.utc)}] Background scheduler started!")
+    print(f"[{django_timezone.now()}] Background scheduler started!")
     print("• Pending tasks will run every 5 minutes")
     print("• Modpack data will update every 30 minutes")
     
@@ -813,7 +809,7 @@ def schedule_modpack_updates():
             # Get current time for comparisons (in seconds since epoch)
             current_time = time.time()
             # Format current time as a string for logging (timezone-aware)
-            current_time_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+            current_time_str = django_timezone.now().strftime("%Y-%m-%d %H:%M:%S")
             
             # Run pending tasks every 5 minutes
             if current_time - last_task_run >= 300:  # 5 minutes = 300 seconds
@@ -859,7 +855,7 @@ def schedule_modpack_updates():
             time.sleep(60)
             
         except Exception as e:
-            error_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            error_time = django_timezone.now().strftime("%Y-%m-%d %H:%M:%S")
             print(f"[{error_time}] Error in scheduler: {e}")
             time.sleep(300)  # Wait 5 minutes before retrying
 
@@ -934,7 +930,6 @@ def fetch_modpack_files(project_id):
 def fetch_modpack_dependencies(project_id, force_refresh=False):
     """Fetch modpack dependencies from official CurseForge API with database storage"""
     from django.core.cache import cache
-    from datetime import datetime, timedelta
     
     # First, try to get from database
     try:
@@ -947,7 +942,7 @@ def fetch_modpack_dependencies(project_id, force_refresh=False):
                 models.Max('last_fetched')
             )['last_fetched__max']
             
-            if latest_fetch and (django_datetime.now(timezone.utc) - latest_fetch).days < 1:
+            if latest_fetch and (django_timezone.now() - latest_fetch).days < 1:
                 print(f"Using stored dependencies for project {project_id}")
                 dependencies_list = []
                 for dep in stored_dependencies:
@@ -994,8 +989,6 @@ def fetch_modpack_dependencies(project_id, force_refresh=False):
                 'dependencies': [],
                 'message': 'Dependencies endpoint not available in current API version'
             }
-            # Cache the result for 1 hour
-            cache.set(cache_key, result, 3600)
             return result
         
         response.raise_for_status()
@@ -1020,8 +1013,6 @@ def fetch_modpack_dependencies(project_id, force_refresh=False):
                 logo_url = dep_info.get('logoUrl')
                 
                 # Parse dates properly
-                from datetime import datetime
-                
                 def parse_date(date_str):
                     if not date_str:
                         return None
