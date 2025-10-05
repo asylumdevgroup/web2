@@ -257,7 +257,7 @@ def _run_scraping_task(task):
     try:
         # Update task status
         task.status = 'running'
-        task.started_at = timezone.now()
+        task.started_at = datetime.now(timezone.utc)
         task.save()
         
         modpacks_found = 0
@@ -311,7 +311,7 @@ def _run_scraping_task(task):
                         existing_modpack.modloader = curseforge_data.get('modloader', '') or 'Unknown'
                         existing_modpack.downloads = curseforge_data.get('downloads', 0)
                         existing_modpack.followers = curseforge_data.get('followers', 0)
-                        existing_modpack.last_updated = timezone.now()
+                        existing_modpack.last_updated = datetime.now(timezone.utc)
                         existing_modpack.is_active = True
                         existing_modpack.save()
                         modpack = existing_modpack
@@ -331,7 +331,7 @@ def _run_scraping_task(task):
                             modloader=curseforge_data.get('modloader', '') or 'Unknown',
                             downloads=curseforge_data.get('downloads', 0),
                             followers=curseforge_data.get('followers', 0),
-                            last_updated=timezone.now(),
+                            last_updated=datetime.now(timezone.utc),
                             is_active=True
                         )
                         created = True
@@ -351,7 +351,7 @@ def _run_scraping_task(task):
                         modloader=curseforge_data.get('modloader', '') or 'Unknown',
                         downloads=curseforge_data.get('downloads', 0),
                         followers=curseforge_data.get('followers', 0),
-                        last_updated=timezone.now(),
+                        last_updated=datetime.now(timezone.utc),
                         is_active=True
                     )
                     created = True
@@ -366,7 +366,7 @@ def _run_scraping_task(task):
         
         # Update task status
         task.status = 'completed'
-        task.completed_at = timezone.now()
+        task.completed_at = datetime.now(timezone.utc)
         task.modpacks_found = modpacks_found
         task.save()
         
@@ -375,7 +375,7 @@ def _run_scraping_task(task):
     except Exception as e:
         # Update task status on error
         task.status = 'failed'
-        task.completed_at = timezone.now()
+        task.completed_at = datetime.now(timezone.utc)
         task.error_message = str(e)
         task.save()
         print(f"Scraping task {task.id} failed: {e}")
@@ -551,7 +551,7 @@ def api_refetch_modpack(request, modpack_id):
             # Ensure project ID is stored
             modpack.project_id = project_id
             
-            modpack.last_updated = timezone.now()
+            modpack.last_updated = datetime.now(timezone.utc)
             modpack.save()
             
             return JsonResponse({
@@ -787,7 +787,7 @@ def update_modpack_data(modpack):
             # Ensure project ID is stored
             modpack.project_id = project_id
             
-            modpack.last_updated = timezone.now()
+            modpack.last_updated = datetime.now(timezone.utc)
             modpack.save()
             return True
         else:
@@ -804,7 +804,7 @@ def schedule_modpack_updates():
     last_modpack_update = 0
     last_task_run = 0
     
-    print(f"[{timezone.now()}] Background scheduler started!")
+    print(f"[{datetime.now(timezone.utc)}] Background scheduler started!")
     print("• Pending tasks will run every 5 minutes")
     print("• Modpack data will update every 30 minutes")
     
@@ -813,7 +813,7 @@ def schedule_modpack_updates():
             # Get current time for comparisons (in seconds since epoch)
             current_time = time.time()
             # Format current time as a string for logging (timezone-aware)
-            current_time_str = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
+            current_time_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
             
             # Run pending tasks every 5 minutes
             if current_time - last_task_run >= 300:  # 5 minutes = 300 seconds
@@ -947,7 +947,7 @@ def fetch_modpack_dependencies(project_id, force_refresh=False):
                 models.Max('last_fetched')
             )['last_fetched__max']
             
-            if latest_fetch and (django_timezone.now() - latest_fetch).days < 1:
+            if latest_fetch and (django_datetime.now(timezone.utc) - latest_fetch).days < 1:
                 print(f"Using stored dependencies for project {project_id}")
                 dependencies_list = []
                 for dep in stored_dependencies:
