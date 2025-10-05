@@ -804,14 +804,16 @@ def schedule_modpack_updates():
     last_modpack_update = 0
     last_task_run = 0
     
-    print(f"[{datetime.datetime.now()}] Background scheduler started!")
+    print(f"[{timezone.now()}] Background scheduler started!")
     print("• Pending tasks will run every 5 minutes")
     print("• Modpack data will update every 30 minutes")
     
     while True:
         try:
+            # Get current time for comparisons (in seconds since epoch)
             current_time = time.time()
-            current_time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Format current time as a string for logging (timezone-aware)
+            current_time_str = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
             
             # Run pending tasks every 5 minutes
             if current_time - last_task_run >= 300:  # 5 minutes = 300 seconds
